@@ -1,4 +1,5 @@
 import 'package:apis/getApi.dart';
+import 'package:easy_search_bar/easy_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,12 +13,27 @@ class Vista2 extends StatefulWidget {
 class _Vista2State extends State<Vista2> {
   List val = [];
 
+  String searchValue = '';
+  final List<String> _suggestions = [
+    'Afeganistan', 'Albania', 'Algeria', 'Australia', 'Brazil', 'German',
+    'Madagascar', 'Mozambique', 'Portugal', 'Zambia'];
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: EasySearchBar(
+          title: const Text('Example'),
+        onSearch: (value) => setState(() =>
+        searchValue = value),
+        suggestions: _suggestions
+      ),
       body: Stack(
         children: [
-          Column(
+          Center(
+              child: Text('Value: $searchValue')
+          )
+          /*Column(
             children: [
               Card(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -192,7 +208,7 @@ class _Vista2State extends State<Vista2> {
                 ),
               )
             ),
-          )
+          )*/
         ],
       ),
     );

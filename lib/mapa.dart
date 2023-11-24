@@ -1,6 +1,7 @@
 import 'package:apis/colores.dart';
 import 'package:apis/getApi.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
@@ -113,10 +114,6 @@ class _MapaState extends State<Mapa> {
     ));
   }
 
-
-
-
-
   //Imagen -> Marca para visualizar en el mapa
   BitmapDescriptor sourceIcon = BitmapDescriptor.defaultMarker;
   void setCustomMarkerIcon() {
@@ -127,6 +124,22 @@ class _MapaState extends State<Mapa> {
     );
   }
 
+  getLatLng() async {
+    //Dirección correcta -> las coordenadas
+    List<Location> locations = await
+            locationFromAddress("Av. Sierra Vista 712, las Haciendas");
+    print(locations);
+    print(locations[0].latitude);
+    print(locations[0].longitude);
+  }
+
+  getDirection() async {
+    // con coordenadas -> la dirección
+    List<Placemark> placemarks = await
+    placemarkFromCoordinates(52.2165157, 6.9437819);
+    print(placemarks);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,6 +148,8 @@ class _MapaState extends State<Mapa> {
           GoogleMap(
             onMapCreated: _onMapCreated,
             polylines: polyLines,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
             markers: {
               const Marker(
                 markerId: MarkerId("source"),
@@ -162,22 +177,68 @@ class _MapaState extends State<Mapa> {
             padding: const EdgeInsets.only(bottom: 15),
             child: Align(
               alignment: Alignment.bottomCenter,
-              child: FloatingActionButton.large(
-                onPressed: () {
-                  setState(() {
-                    Navigator.pushReplacement(context, MaterialPageRoute(
-                        builder: (context) => const Vista2()));
-                  });
-                },
-                child: const Text(
-                  'Pasar a la siguiente vista', textAlign: TextAlign.center,
-                ),
-              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FloatingActionButton.large(
+                    onPressed: () {
+                      setState(() {
+                        Navigator.push(context, MaterialPageRoute(
+                            builder: (context) => const Vista2()));
+                      });
+                    },
+                    child: const Text(
+                      'Pasar a la siguiente vista', textAlign: TextAlign.center,
+                    ),
+                  ),
+                  FloatingActionButton.large(
+                    heroTag: '2',
+                    onPressed: () {
+                      setState(() {
+                        getLatLng();
+                      });
+                    },
+                    child: const Text(
+                      'Obtener coordenadas', textAlign: TextAlign.center,
+                    ),
+                  ),
+                  FloatingActionButton.large(
+                    heroTag: '3',
+                    onPressed: () {
+                      setState(() {
+                        getDirection();
+                      });
+                    },
+                    child: const Text(
+                      'Obtener la dirección', textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              )
+
             )
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _goToNewYork();
+                });
+              },
+              backgroundColor: Colors.orange,
+              child: Icon(Icons.location_searching_rounded),
+            ),
           )
         ],
       ),
     );
+  }
+
+  Future<void> _goToNewYork() async {
+    double lat = 40.7128;
+    double long = -74.0060;
+    ///mapController.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, long), 16));
   }
 
   showAlertDialog(BuildContext context) {
@@ -185,7 +246,9 @@ class _MapaState extends State<Mapa> {
     // set up the buttons
     Widget cancelButton = TextButton(
       child: Text("Cancel"),
-      onPressed:  () {},
+      onPressed:  () {
+        Navigator.pop(context);
+      },
     );
     Widget continueButton = TextButton(
       child: Text("Continue"),
