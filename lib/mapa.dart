@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Mapa extends StatefulWidget {
   const Mapa({super.key});
@@ -13,6 +14,8 @@ class Mapa extends StatefulWidget {
 }
 
 class _MapaState extends State<Mapa> {
+  late SharedPreferences shered;
+
   late GoogleMapController mapController;
 
   late LatLng _center = const LatLng(22.144596, -101.009064);
@@ -27,11 +30,23 @@ class _MapaState extends State<Mapa> {
   static const LatLng sourceLocation = LatLng(22.144596, -101.009064);
   static const LatLng destination = LatLng(22.14973, -100.992221);
 
+  double lat = 0.0;
+  double lng = 0.0;
+
   @override
   void initState() {
     getJsonData(); // Función que realiza el llamado a la api
     setCustomMarkerIcon(); // Se encarga de crear nuestras marcas personalizadas
+
+    check();
+
     super.initState();
+  }
+
+  Future<void> check() async {
+    shered = await SharedPreferences.getInstance();
+    lat = shered.getDouble('lat') ?? 0.0;
+    lng = shered.getDouble('lng') ?? 0.0;
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -172,6 +187,28 @@ class _MapaState extends State<Mapa> {
               target: _center,
               zoom: 11.0,
             ),
+            onCameraMove: (CameraPosition position) {
+              try {
+                lat = position.target.latitude;
+                lng = position.target.longitude;
+
+              } catch (e) {
+                print('Get Service _createMarker: ' + e.toString());
+              }
+              setState(() {});
+            },
+          ),
+          Center(
+            child: Image.asset(
+              'img/icon.png',
+              width: 64,
+              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                return Transform.translate(
+                  offset: const Offset(0, 0),
+                  child: child,
+                );
+              },
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 15),
@@ -223,7 +260,9 @@ class _MapaState extends State<Mapa> {
             child: FloatingActionButton(
               onPressed: () {
                 setState(() {
-                  _goToNewYork();
+                  shered.setDouble('lat', lat);
+                  shered.setDouble('lng', lng);
+                  _goToNewYork(lat, lng);
                 });
               },
               backgroundColor: Colors.orange,
@@ -235,10 +274,10 @@ class _MapaState extends State<Mapa> {
     );
   }
 
-  Future<void> _goToNewYork() async {
-    double lat = 40.7128;
-    double long = -74.0060;
-    ///mapController.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, long), 16));
+  Future<void> _goToNewYork(double lat, double lng) async {
+    //double lat = 40.7128;
+    //double long = -74.0060;
+    mapController.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 16));
   }
 
   showAlertDialog(BuildContext context) {
