@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class NetworkHelper{
-  NetworkHelper({required this.startLng,required this.startLat,required this.endLng,required this.endLat});
+  NetworkHelper({required this.startLng,required this.startLat,
+    required this.endLng,required this.endLat});
 
   final String url ='https://api.openrouteservice.org/v2/directions/';
   final String apiKey = '5b3ce3597851110001cf62489d22383db9384dd2bcad3a6f47678d6f';

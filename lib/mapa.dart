@@ -14,7 +14,7 @@ class Mapa extends StatefulWidget {
 }
 
 class _MapaState extends State<Mapa> {
-  late SharedPreferences shered;
+  late SharedPreferences shared;
 
   late GoogleMapController mapController;
 
@@ -44,9 +44,36 @@ class _MapaState extends State<Mapa> {
   }
 
   Future<void> check() async {
-    shered = await SharedPreferences.getInstance();
-    lat = shered.getDouble('lat') ?? 0.0;
-    lng = shered.getDouble('lng') ?? 0.0;
+    //Instanciamos la variable
+    shared = await SharedPreferences.getInstance();
+
+    //CHECAMOS SI TIENE LA SESION ACTIVA
+    if(shared.getBool('sesionActiva') ?? false) { // si es verdadadero o true
+      //Ingresan a la vista principal o Home
+
+      //Realizar el login
+    }
+
+    //Obtener los datos de Shared
+    lat = shared.getDouble('lat') ?? 0.0;
+    lng = shared.getDouble('lng') ?? 0.0;
+  }
+
+
+  void ingresar() {
+    //if si existe usuario {
+      shared.setString('correo', 'correo@gmail.com');
+      shared.setString('password', '1234');
+
+      shared.setBool('sesionActiva', true);
+      //Ingresan a la vista principal o Home
+    //}
+    //else {
+      shared.setString('correo', '');
+      shared.setString('password', '');
+
+      shared.setBool('sesionActiva', false);
+    //}
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -67,14 +94,16 @@ class _MapaState extends State<Mapa> {
     );
 
     try {
+      //print(data['features'][0]['geometry']['coordinates']); // 3er
       var data;
       //LLamado a la funcion que solicita a la api las coordenadas
       data = await networkHelper.getData();
       print(data); //json completo
+      print(data["metada"]["query"]["coordinates"]);
       print(data['features']); // atributo 1er nivel
       print(data['features'][0]);
       print(data['features'][0]['geometry']); //atributo secundario
-      print(data['features'][0]['geometry']['coordinates']); // 3er
+      //variable para controlar y craer la polyline que dibujaremos en el mapa
       LineString ls = LineString(data['features'][0]['geometry']['coordinates']);
 
       for(int i = 0; i < ls.lineString.length; i++){
@@ -117,7 +146,8 @@ class _MapaState extends State<Mapa> {
         double.parse("22.142435"),
         double.parse("-101.009346"));
 
-    _markers.add(Marker(
+    _markers.add(
+        Marker(
       icon: BitmapDescriptor.fromBytes(dataBytes.buffer.asUint8List()),
       markerId: MarkerId(_lastMapPositionPoints.toString()),
       position: _lastMapPositionPoints,
@@ -165,7 +195,7 @@ class _MapaState extends State<Mapa> {
             polylines: polyLines,
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
-            markers: {
+            markers:{
               const Marker(
                 markerId: MarkerId("source"),
                 position: sourceLocation,
@@ -260,8 +290,8 @@ class _MapaState extends State<Mapa> {
             child: FloatingActionButton(
               onPressed: () {
                 setState(() {
-                  shered.setDouble('lat', lat);
-                  shered.setDouble('lng', lng);
+                  shared.setDouble('lat', lat);
+                  shared.setDouble('lng', lng);
                   _goToNewYork(lat, lng);
                 });
               },

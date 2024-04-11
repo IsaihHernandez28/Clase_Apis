@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:apis/getApi.dart';
+import 'package:apis/web_view.dart';
 import 'package:easy_search_bar/easy_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class Vista2 extends StatefulWidget {
   const Vista2({super.key});
@@ -19,6 +23,14 @@ class _Vista2State extends State<Vista2> {
     'Madagascar', 'Mozambique', 'Portugal', 'Zambia'];
 
 
+  final String selectedUrl = 'https://flutter.dev/';
+  final Completer<WebViewController> _controller =
+  Completer<WebViewController>();
+
+  //bool isLoading = true;
+  int _stackToView = 1;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,9 +42,29 @@ class _Vista2State extends State<Vista2> {
       ),
       body: Stack(
         children: [
-          Center(
+          /*Center(
               child: Text('Value: $searchValue')
-          )
+          ),*/
+
+          StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Scaffold(
+                  body: IndexedStack(
+                    index: _stackToView,
+                    children: <Widget>[
+                      WebView(
+                        initialUrl: selectedUrl,
+                        javascriptMode: JavaScriptMode.unrestricted,
+                        onWebViewCreated: (WebViewController webViewController) {
+                          _controller.complete(webViewController);
+                        },
+                      ),
+                      Center(child: CircularProgressIndicator())
+                    ],
+                  ),
+                );
+              }),
+          //Text("uybuhbnksnf", style: TesxtStyle(size: MediaQuery.of(context).size.width >= 800 ? 22 : 20)),
           /*Column(
             children: [
               Card(
