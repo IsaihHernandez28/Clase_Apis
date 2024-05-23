@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1049228021692",
+    "project_id": "cinem-app-7lxnx5",
+    "storage_bucket": "cinem-app-7lxnx5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1049228021692:android:57f0f26cec7d2d4547a5b9",
+        "android_client_info": {
+          "package_name": "com.mycompany.cinemapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTTjhj3o7iyCc5MTE4ZOte3d71Bt3di-M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
